@@ -2,6 +2,8 @@ class Game:
     
     def __init__(self):
         self.plateau = self.creer_plateau()
+        self.noir = Noir()
+        self.blanc = Blanc()
         self.placement()
     
     def creer_plateau(self):
@@ -16,28 +18,26 @@ class Game:
             print(self.plateau[i])
     
     def placement(self):
-        vide = 0
-        pion = 1
-        cavalier = 2
-        fou = 3
-        tour = 4
-        dame = 5
-        roi = 6
-        self.plateau[0] = [tour, cavalier, fou, dame, roi, fou, cavalier, tour]
-        self.plateau[1] = [pion] * 8
-        self.plateau[6] = [pion] * 8
-        self.plateau[7] = [tour, cavalier, fou, dame, roi, fou, cavalier, tour]
-    
-    
-    
+        for x, y in self.noir.pieces:
+            self.plateau[y][x] = self.noir.pieces[(x,y)]
+        for x, y in self.blanc.pieces:
+            self.plateau[y][x] = self.blanc.pieces[(x,y)]
     
 class Noir:
-    pass
+    def __init__(self):
+        self.pieces = {(0, 7) : 4, (1, 7) : 2, (2, 7) : 3, (3, 7) : 5, (4, 7) : 6, (5, 7) : 3, (6, 7) : 2, (7, 7) : 4,
+                       (0, 6) : 1, (1, 6) : 1, (2, 6) : 1, (3, 6) : 1, (4, 6) : 1, (5, 6) : 1, (6, 6) : 1, (7, 6) : 1}
+        self.possibilite_rock = True
+
 
 class Blanc:
-    pass
+    def __init__(self):
+        self.pieces = {(0, 0) : 4, (1, 0) : 2, (2, 0) : 3, (3, 0) : 5, (4, 0) : 6, (5, 0) : 3, (6, 0) : 2, (7, 0) : 4,
+                       (0, 1) : 1, (1, 1) : 1, (2, 1) : 1, (3, 1) : 1, (4, 1) : 1, (5, 1) : 1, (6, 1) : 1, (7, 1) : 1}
+        self.possibilite_rock = True
         
     
 chess = Game()
 
 print(chess.afficher())
+

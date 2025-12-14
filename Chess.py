@@ -1,5 +1,19 @@
 import pyxel
 
+class Piece :
+    def __init__(self, nom : str, x : int, y : int, EstBlanc : bool) :
+        self.nom = nom
+        self.x = x
+        self.y = y
+        self.EstBlanc = EstBlanc
+        self.first_case = True
+
+    def creer_deplacement(self) :
+        l = []
+        if self.nom == "PION" :
+            if self.EstBlanc :
+                pass
+
 class Joueur :
     def __init__(self, JoueBlanc) :
         self.score = 0
@@ -36,14 +50,6 @@ class Joueur :
     def ajouter_score(self, score : int) :
         self.score += score
 
-class Piece :
-    def __init__(self, nom : str, x : int, y : int, EstBlanc : bool) :
-        self.nom = nom
-        self.x = x
-        self.y = y
-        self.EstBlanc = EstBlanc
-        self.first_case = True
-
 class Grille :
     def __init__(self) :
         self.plateau = self.creer_plateau()
@@ -55,8 +61,6 @@ class Grille :
     def mettre_pieces(self, joueur : Joueur) :
         for i in joueur.echiquier :
             self.plateau[i.x][i.y] = i
-
-
 
     def afficher_plateau(self) :
         for i in self.plateau :
@@ -134,26 +138,50 @@ class App:
         self.Joueur_Blanc = Joueur(True)
         self.Joueur_Noir = Joueur(False)
 
+        self.piece_selectionnee = None
+
         pyxel.init(256, 256, title="Grid Of Kings")
         pyxel.load("gok.pyxres")
+        pyxel.mouse(True)
         pyxel.run(self.update, self.draw)
+
+
+
+
+    def interagir_piece(self, j : Piece) :
+        if 64 + j.x * 16 <= pyxel.mouse_x < j.x*16 + 81 and 64 + j.y*16 <= pyxel.mouse_y < 81 + j.y*16 :
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) :
+                self.piece_selectionnee = j
+
+    def interagir_plateau(self) :
+        for i in self.jeu.plateau :
+            for j in i :
+                if j != 0 :
+                    if 64 <= pyxel.mouse_x < 193 and 64 <= pyxel.mouse_y < 193 :
+                        if j != 0 :
+                            self.interagir_piece(j)
+
+    def update(self):
+        self.jeu.mettre_pieces(self.Joueur_Noir)
+        self.jeu.mettre_pieces(self.Joueur_Blanc)
+        self.interagir_plateau()
+
+
+
+    def dessiner_piece_selectionnee(self) :
+        if self.piece_selectionnee is not None :
+            pyxel.rect(64 + self.piece_selectionnee.x*16, 64 + self.piece_selectionnee.y*16, 16, 16, 11)
 
     def dessiner_arriere_plan(self) :
         pyxel.rect(0, 0, 256, 256, 7)
         pyxel.rect(48, 48, 160, 160, 13)
 
-    def update(self):
-        self.jeu.mettre_pieces(self.Joueur_Noir)
-        self.jeu.mettre_pieces(self.Joueur_Blanc)
-
-
     def draw(self):
         pyxel.cls(0)
         self.dessiner_arriere_plan()
         self.jeu.dessiner_grille()
+        self.dessiner_piece_selectionnee()
         self.jeu.dessiner_pieces()
-        pyxel.mouse(True)
 
 
 App()
-

@@ -1,58 +1,159 @@
-class Game:
-    
-    def __init__(self):
+import pyxel
+
+class Joueur :
+    def __init__(self, JoueBlanc) :
+        self.score = 0
+        self.JoueBlanc = JoueBlanc
+        self.echiquier = self.creer_echiquier()
+
+    def creer_echiquier(self) :
+        l = []
+        if not self.JoueBlanc :
+            for i in range(8) :
+                l.append(Piece("PION", i, 1, False))
+            l.append(Piece("CAVALIER", 1, 0, False))
+            l.append(Piece("CAVALIER", 6, 0, False))
+            l.append(Piece("TOUR", 0, 0, False))
+            l.append(Piece("TOUR", 7, 0, False))
+            l.append(Piece("FOU", 2, 0, False))
+            l.append(Piece("FOU", 5, 0, False))
+            l.append(Piece("DAME", 3, 0, False))
+            l.append(Piece("ROI", 4, 0, False))
+            return l
+        else :
+            for i in range(8) :
+                l.append(Piece("PION", i, 6, True))
+            l.append(Piece("CAVALIER", 1, 7, True))
+            l.append(Piece("CAVALIER", 6, 7, True))
+            l.append(Piece("TOUR", 0, 7, True))
+            l.append(Piece("TOUR", 7, 7, True))
+            l.append(Piece("FOU", 2, 7, True))
+            l.append(Piece("FOU", 5, 7, True))
+            l.append(Piece("DAME", 3, 7, True))
+            l.append(Piece("ROI", 4, 7, True))
+            return l
+
+    def ajouter_score(self, score : int) :
+        self.score += score
+
+class Piece :
+    def __init__(self, nom : str, x : int, y : int, EstBlanc : bool) :
+        self.nom = nom
+        self.x = x
+        self.y = y
+        self.EstBlanc = EstBlanc
+        self.first_case = True
+
+class Grille :
+    def __init__(self) :
         self.plateau = self.creer_plateau()
-        self.noir = Noir()
-        self.blanc = Blanc()
-        self.current_player = 'blanc'
-        self.placement()
-    
-    def creer_plateau(self):
-        grille = []
-        for i in range(8):
-            grille.append([0,0,0,0,0,0,0,0])
-        return grille
-    
-    def afficher(self):
-        board_str = ""
-        for i in range(8):
-            board_str += str(self.plateau[i]) + "\n"
-        return board_str
-    
-    def placement(self):
-        for x, y in self.noir.pieces:
-            self.plateau[y][x] = self.noir.pieces[(x,y)]
-        for x, y in self.blanc.pieces:
-            self.plateau[y][x] = self.blanc.pieces[(x,y)]
+        self.Taille_Cellule = 16
 
-    def deplacement(self, anciennes_coordonnees, nouvelles_coordonnees):
-        ax, ay = anciennes_coordonnees
-        nx, ny = nouvelles_coordonnees
-        player = self.noir if self.current_player == 'noir' else self.blanc
-        if (ax, ay) in player.pieces:
-            piece = player.pieces[(ax, ay)]
-            del player.pieces[(ax, ay)]
-            player.pieces[(nx, ny)] = piece
-            self.plateau[ny][nx] = piece
-            self.plateau[ay][ax] = 0
-            self.current_player = 'blanc' if self.current_player == 'noir' else 'noir'
+    def creer_plateau(self) :
+        return [[0 for _ in range(8)] for _ in range(8)]
 
-    
-class Noir:
+    def mettre_pieces(self, joueur : Joueur) :
+        for i in joueur.echiquier :
+            self.plateau[i.x][i.y] = i
+
+
+
+    def afficher_plateau(self) :
+        for i in self.plateau :
+            print(i, "\n")
+
+    def dessiner_blanc_noir(self, ligne : int) :
+        pyxel.rect(64 + 0*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 7)
+        pyxel.rect(64 + 1*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 0)
+        pyxel.rect(64 + 2*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 7)
+        pyxel.rect(64 + 3*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 0)
+        pyxel.rect(64 + 4*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 7)
+        pyxel.rect(64 + 5*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 0)
+        pyxel.rect(64 + 6*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 7)
+        pyxel.rect(64 + 7*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 0)
+
+    def dessiner_noir_blanc(self, ligne : int) :
+        pyxel.rect(64 + 0*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 0)
+        pyxel.rect(64 + 1*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 7)
+        pyxel.rect(64 + 2*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 0)
+        pyxel.rect(64 + 3*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 7)
+        pyxel.rect(64 + 4*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 0)
+        pyxel.rect(64 + 5*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 7)
+        pyxel.rect(64 + 6*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 0)
+        pyxel.rect(64 + 7*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 7)
+
+    def dessiner_grille(self) :
+        for ligne in range(8):
+            for colonne in range(8):
+                if ligne % 2 == 0 :
+                    self.dessiner_blanc_noir(ligne)
+                else :
+                    self.dessiner_noir_blanc(ligne)
+
+    def dessiner_pieces(self) :
+        for i in range(len(self.plateau)) :
+            for j in range(len(self.plateau[i])) :
+                piece = self.plateau[i][j]
+                if type(piece) is not int :
+                    if piece.nom == "PION" :
+                        if not piece.EstBlanc :
+                            pyxel.blt(64 + i*16, 64 + j*16, 0, 0, 16, 16, 16, 5)
+                        else :
+                            pyxel.blt(64 + i*16, 64 + j*16, 0, 0, 0, 16, 16, 5)
+                    if piece.nom == "CAVALIER" :
+                            if not piece.EstBlanc :
+                                pyxel.blt(64 + i*16, 64 + j*16, 0, 16, 16, 16, 16, 5)
+                            else :
+                                pyxel.blt(64 + i*16, 64 + j*16, 0, 16, 0, 16, 16, 5)
+                    if piece.nom == "FOU" :
+                            if not piece.EstBlanc :
+                                pyxel.blt(64 + i*16, 64 + j*16, 0, 32, 16, 16, 16, 5)
+                            else :
+                                pyxel.blt(64 + i*16, 64 + j*16, 0, 32, 0, 16, 16, 5)
+                    if piece.nom == "TOUR" :
+                            if not piece.EstBlanc :
+                                pyxel.blt(64 + i*16, 64 + j*16, 0, 48, 16, 16, 16, 5)
+                            else :
+                                pyxel.blt(64 + i*16, 64 + j*16, 0, 48, 0, 16, 16, 5)
+                    if piece.nom == "DAME" :
+                            if not piece.EstBlanc :
+                                pyxel.blt(64 + i*16, 64 + j*16, 0, 64, 16, 16, 16, 5)
+                            else :
+                                pyxel.blt(64 + i*16, 64 + j*16, 0, 64, 0, 16, 16, 5)
+                    if piece.nom == "ROI" :
+                            if not piece.EstBlanc :
+                                pyxel.blt(64 + i*16, 64 + j*16, 0, 80, 16, 16, 16, 5)
+                            else :
+                                pyxel.blt(64 + i*16, 64 + j*16, 0, 80, 0, 16, 16, 5)
+
+
+
+class App:
     def __init__(self):
-        self.pieces = {(0, 0) : 4, (1, 0) : 2, (2, 0) : 3, (3, 0) : 5, (4, 0) : 6, (5, 0) : 3, (6, 0) : 2, (7, 0) : 4,
-                       (0, 1) : 1, (1, 1) : 1, (2, 1) : 1, (3, 1) : 1, (4, 1) : 1, (5, 1) : 1, (6, 1) : 1, (7, 1) : 1}
-        self.possibilite_rock = True
+        self.jeu = Grille()
+        self.Joueur_Blanc = Joueur(True)
+        self.Joueur_Noir = Joueur(False)
+
+        pyxel.init(256, 256, title="Grid Of Kings")
+        pyxel.load("gok.pyxres")
+        pyxel.run(self.update, self.draw)
+
+    def dessiner_arriere_plan(self) :
+        pyxel.rect(0, 0, 256, 256, 7)
+        pyxel.rect(48, 48, 160, 160, 13)
+
+    def update(self):
+        self.jeu.mettre_pieces(self.Joueur_Noir)
+        self.jeu.mettre_pieces(self.Joueur_Blanc)
 
 
-class Blanc:
-    def __init__(self):
-        self.pieces = {(0, 7) : 4, (1, 7) : 2, (2, 7) : 3, (3, 7) : 5, (4, 7) : 6, (5, 7) : 3, (6, 7) : 2, (7, 7) : 4,
-                       (0, 6) : 1, (1, 6) : 1, (2, 6) : 1, (3, 6) : 1, (4, 6) : 1, (5, 6) : 1, (6, 6) : 1, (7, 6) : 1}
-        self.possibilite_rock = True
-        
-    
-chess = Game()
-chess.deplacement((6,0),(5,0))
-print(chess.afficher())
+    def draw(self):
+        pyxel.cls(0)
+        self.dessiner_arriere_plan()
+        self.jeu.dessiner_grille()
+        self.jeu.dessiner_pieces()
+        pyxel.mouse(True)
+
+
+App()
 

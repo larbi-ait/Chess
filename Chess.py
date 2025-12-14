@@ -7,12 +7,26 @@ class Piece :
         self.y = y
         self.EstBlanc = EstBlanc
         self.first_case = True
+        self.case_atteignable = []
 
-    def creer_deplacement(self) :
-        l = []
-        if self.nom == "PION" :
-            if self.EstBlanc :
-                pass
+    def deplacement(self, coord : (x, y)):
+        if coord in self.case_atteignable:
+            self.x, self.y = coord
+            self.first_case = False
+            
+    def case_atteignable(self):
+        moves = []
+        if self.nom == "PION":
+            pass
+        if self.nom == "CAVALIER":
+            pass
+        if self.nom == "TOUR" or self.nom == "DAME":
+            pass
+        if self.nom == "FOU" or self.nom == "DAME":
+            pass
+        if self.nom == "ROI":
+            pass
+        
 
 class Joueur :
     def __init__(self, JoueBlanc) :
@@ -143,6 +157,10 @@ class App:
         self.jeu = Grille()
         self.Joueur_Blanc = Joueur(True)
         self.Joueur_Noir = Joueur(False)
+        for i in self.jeu.plateau:
+            for j in i:
+                if j != 0:
+                    j.case_atteignable()
         self.current_player = self.Joueur_Blanc
         self.piece_selectionnee = None
 

@@ -42,8 +42,7 @@ class Piece :
         self.x = x
         self.y = y
         self.EstBlanc = EstBlanc
-
-
+        self.first_case = True
 
 class Grille :
     def __init__(self) :
@@ -156,3 +155,4 @@ class App:
 
 
 App()
+

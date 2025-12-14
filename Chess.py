@@ -161,6 +161,7 @@ class App:
             for j in i:
                 if j != 0:
                     j.case_atteignable()
+        self.current_player = self.Joueur_Blanc
         self.piece_selectionnee = None
 
         pyxel.init(256, 256, title="Grid Of Kings")
@@ -168,12 +169,9 @@ class App:
         pyxel.mouse(True)
         pyxel.run(self.update, self.draw)
 
-
-
-
     def interagir_piece(self, j : Piece) :
         if 64 + j.x * 16 <= pyxel.mouse_x < j.x*16 + 81 and 64 + j.y*16 <= pyxel.mouse_y < 81 + j.y*16 :
-            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) :
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and j.EstBlanc == self.current_player.JoueBlanc:
                 self.piece_selectionnee = j
 
     def interagir_plateau(self) :
@@ -181,8 +179,7 @@ class App:
             for j in i :
                 if j != 0 :
                     if 64 <= pyxel.mouse_x < 193 and 64 <= pyxel.mouse_y < 193 :
-                        if j != 0 :
-                            self.interagir_piece(j)
+                        self.interagir_piece(j)
 
     def update(self):
         self.jeu.mettre_pieces(self.Joueur_Noir)
@@ -190,7 +187,7 @@ class App:
         self.interagir_plateau()
 
     def dessiner_piece_selectionnee(self) :
-        if self.piece_selectionnee is not None :
+        if self.piece_selectionnee is not None:
             pyxel.rect(64 + self.piece_selectionnee.x*16, 64 + self.piece_selectionnee.y*16, 16, 16, 11)
 
     def dessiner_arriere_plan(self) :

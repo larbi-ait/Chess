@@ -17,6 +17,7 @@ class Piece :
 class Joueur :
     def __init__(self, JoueBlanc) :
         self.score = 0
+        self.coups = 0
         self.JoueBlanc = JoueBlanc
         self.echiquier = self.creer_echiquier()
 
@@ -49,6 +50,11 @@ class Joueur :
 
     def ajouter_score(self, score : int) :
         self.score += score
+
+    def nb_coups(self):
+        self.coups += 1
+        return self.coups
+        
 
 class Grille :
     def __init__(self) :
@@ -185,3 +191,4 @@ class App:
 
 
 App()
+

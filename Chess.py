@@ -7,26 +7,89 @@ class Piece :
         self.y = y
         self.EstBlanc = EstBlanc
         self.first_case = True
-        self.case_atteignable = []
+        self.cases_atteignables = []
 
     def deplacement(self, coord : (x, y)):
         if coord in self.case_atteignable:
             self.x, self.y = coord
             self.first_case = False
+
+    def on_board(self, x, y):
+        return 0 <= x <= 7 and 0 <= y <= 7
             
-    def case_atteignable(self):
+    def update_case_atteignables(self, jeu):
         moves = []
+        plateau = jeu.jeu.plateau
+        if self.EstBlanc:
+            ennemi = jeu.JoueurNoir
+        else:
+            ennemi = jeu.JoueurBlanc
         if self.nom == "PION":
-            pass
+            if self.EstBlanc:
+                delta = [(0,1),(0,2),(1,1),(-1,1)]
+            else:
+                delta = [(0,-1),(0,-2),(-1,-1),(1,-1)]
+            for dx, dy in delta:
+                nx, ny = self.x + dx, self.y + dy
+                if self.on_board(nx, ny):
+                    if dx == 0 and dy == 1 and plateau[ny][nx] == 0:
+                        moves.append((nx, ny))
+                    elif self.first_case and dx == 0 and dy == 2 and plateau[ny][nx - 1] == 0 and plateau[ny][nx] == 0:
+                        moves.append((nx, ny))
+                    elif plateau[ny][nx] != 0 and plateau[ny][nx].EstBlanc != self.EstBlanc:
+                        moves.append((nx, ny))
         if self.nom == "CAVALIER":
-            pass
+            delta = [(2,1),(2,-1),(-2,1),(-2,-1),(1,2),(-1,2),(1,-2),(-1,-2)]
+            for dx, dy in delta:
+                nx, ny = self.x + dx, self.y + dy
+                if self.on_board(nx, ny):
+                    if plateau[ny][nx] == 0  or plateau[ny][nx].EstBlanc != self.EstBlanc:
+                        moves.append((nx, ny))
         if self.nom == "TOUR" or self.nom == "DAME":
-            pass
+            delta = [(-1,0),(0,-1),(1,0),(0,1)]
+            for dx, dy in delta:
+                nx, ny = self.x + dx, self.y + dy
+                while self.on_board(nx, ny):
+                    if plateau[ny][nx] == 0:
+                        moves.append((nx, ny))
+                        nx, ny = self.x + dx, self.y + dy
+                    elif plateau[ny][nx].EstBlanc != self.EstBlanc:
+                        moves.append((nx, ny))
+                        break
+                    else:
+                        break
         if self.nom == "FOU" or self.nom == "DAME":
-            pass
+            delta = [(-1,-1),(1,-1),(1,1),(-1,1)]
+            for dx, dy in delta:
+                nx, ny = self.x + dx, self.y + dy
+                while self.on_board(nx, ny):
+                    if plateau[ny][nx] == 0:
+                        moves.append((nx, ny))
+                        nx, ny = self.x + dx, self.y + dy
+                    elif plateau[ny][nx].EstBlanc != self.EstBlanc:
+                        moves.append((nx, ny))
+                        break
+                    else:
+                        break
         if self.nom == "ROI":
-            pass
-        
+            delta = [(-1,-1),(1,-1),(1,1),(-1,1),(-1,0),(0,-1),(1,0),(0,1)]
+            case_prises = []
+            for i in ennemi.echiquier:
+                if i.nom == "PION":
+                    if self.EstBlanc:
+                        cases_prises += [(i.x-1,i.y-1),(i.x+1,i.y-1)]
+                    else:
+                        cases_prises += [(i.x+1,i.y+1),(i.x-1,i.y+1)]
+                elif i.nom == "ROI":
+                    cases_prises += [(i.x-1,i.y-1),(i.x+1,i.y-1),(i.x+1,i.y+1),(i.x-1,i.y+1),(i.x-1,i.y+0),(i.x+0,i.y-1),(i.x+1,i.y+0),(i.x+0,i.y+1)]
+                else:
+                    cases_prises += i.cases_atteignables
+            for i in delta:
+                nx, ny = self.x + dx, self.y + dy
+                if self.on_board(nx, ny):
+                    if not (nx,ny) in cases_prises and (plateau[ny][nx] == 0  or plateau[ny][nx].EstBlanc != self.EstBlanc):
+                        moves.append((nx,ny))
+        self.cases_atteignables = moves
 
 class Joueur :
     def __init__(self, JoueBlanc) :
@@ -34,6 +97,7 @@ class Joueur :
         self.coups = 0
         self.JoueBlanc = JoueBlanc
         self.echiquier = self.creer_echiquier()
+        self.cases_controlees = []
 
     def creer_echiquier(self) :
         l = []
@@ -68,6 +132,11 @@ class Joueur :
     def nb_coups(self):
         self.coups += 1
         return self.coups
+
+    def update_cases_controlees(self, jeu : App):
+        self.cases_controlees = []
+        for j in self.echiquier:
+            self.cases_controlees += j.update_cases_atteignables(jeu)
         
 
 class Grille :
@@ -81,10 +150,6 @@ class Grille :
     def mettre_pieces(self, joueur : Joueur) :
         for i in joueur.echiquier :
             self.plateau[i.x][i.y] = i
-
-    def afficher_plateau(self) :
-        for i in self.plateau :
-            print(i, "\n")
 
     def dessiner_blanc_noir(self, ligne : int) :
         pyxel.rect(64 + 0*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 7)
@@ -151,16 +216,13 @@ class Grille :
                                 pyxel.blt(64 + i*16, 64 + j*16, 0, 80, 0, 16, 16, 5)
 
 
-
 class App:
     def __init__(self):
         self.jeu = Grille()
         self.Joueur_Blanc = Joueur(True)
         self.Joueur_Noir = Joueur(False)
-        for i in self.jeu.plateau:
-            for j in i:
-                if j != 0:
-                    j.case_atteignable()
+        self.Joueur_Noir.update_cases_controlees(self)
+        self.Joueur_Blanc.update_cases_controlees(self)
         self.current_player = self.Joueur_Blanc
         self.piece_selectionnee = None
 
@@ -203,3 +265,4 @@ class App:
 
 
 App()
+

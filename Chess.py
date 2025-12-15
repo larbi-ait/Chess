@@ -9,21 +9,21 @@ class Piece :
         self.first_case = True
         self.cases_atteignables = []
 
-    def deplacement(self, coord : (x, y)):
-        if coord in self.case_atteignable:
+    def deplacement(self, coord):
+        if coord in self.cases_atteignables:
             self.x, self.y = coord
             self.first_case = False
 
     def on_board(self, x, y):
         return 0 <= x <= 7 and 0 <= y <= 7
             
-    def update_case_atteignables(self, jeu):
+    def update_cases_atteignables(self, jeu):
         moves = []
         plateau = jeu.jeu.plateau
         if self.EstBlanc:
-            ennemi = jeu.JoueurNoir
+            ennemi = jeu.Joueur_Noir
         else:
-            ennemi = jeu.JoueurBlanc
+            ennemi = jeu.Joueur_Blanc
         if self.nom == "PION":
             if self.EstBlanc:
                 delta = [(0,1),(0,2),(1,1),(-1,1)]
@@ -49,31 +49,33 @@ class Piece :
             delta = [(-1,0),(0,-1),(1,0),(0,1)]
             for dx, dy in delta:
                 nx, ny = self.x + dx, self.y + dy
-                while self.on_board(nx, ny):
+                stop = False
+                while self.on_board(nx, ny) and not stop:
                     if plateau[ny][nx] == 0:
                         moves.append((nx, ny))
-                        nx, ny = self.x + dx, self.y + dy
+                        nx, ny = nx + dx, ny + dy
                     elif plateau[ny][nx].EstBlanc != self.EstBlanc:
                         moves.append((nx, ny))
-                        break
+                        stop = True
                     else:
-                        break
+                        stop = True
         if self.nom == "FOU" or self.nom == "DAME":
             delta = [(-1,-1),(1,-1),(1,1),(-1,1)]
             for dx, dy in delta:
                 nx, ny = self.x + dx, self.y + dy
-                while self.on_board(nx, ny):
+                stop = False
+                while self.on_board(nx, ny) and not stop:
                     if plateau[ny][nx] == 0:
                         moves.append((nx, ny))
-                        nx, ny = self.x + dx, self.y + dy
+                        nx, ny = nx + dx, ny + dy
                     elif plateau[ny][nx].EstBlanc != self.EstBlanc:
                         moves.append((nx, ny))
-                        break
+                        stop = True
                     else:
-                        break
+                        stop = True
         if self.nom == "ROI":
             delta = [(-1,-1),(1,-1),(1,1),(-1,1),(-1,0),(0,-1),(1,0),(0,1)]
-            case_prises = []
+            cases_prises = []
             for i in ennemi.echiquier:
                 if i.nom == "PION":
                     if self.EstBlanc:
@@ -84,12 +86,13 @@ class Piece :
                     cases_prises += [(i.x-1,i.y-1),(i.x+1,i.y-1),(i.x+1,i.y+1),(i.x-1,i.y+1),(i.x-1,i.y+0),(i.x+0,i.y-1),(i.x+1,i.y+0),(i.x+0,i.y+1)]
                 else:
                     cases_prises += i.cases_atteignables
-            for i in delta:
+            for dx, dy in delta:
                 nx, ny = self.x + dx, self.y + dy
                 if self.on_board(nx, ny):
                     if not (nx,ny) in cases_prises and (plateau[ny][nx] == 0  or plateau[ny][nx].EstBlanc != self.EstBlanc):
                         moves.append((nx,ny))
         self.cases_atteignables = moves
+        return moves
 
 class Joueur :
     def __init__(self, JoueBlanc) :
@@ -133,7 +136,7 @@ class Joueur :
         self.coups += 1
         return self.coups
 
-    def update_cases_controlees(self, jeu : App):
+    def update_cases_controlees(self, jeu):
         self.cases_controlees = []
         for j in self.echiquier:
             self.cases_controlees += j.update_cases_atteignables(jeu)
@@ -190,30 +193,30 @@ class Grille :
                         else :
                             pyxel.blt(64 + i*16, 64 + j*16, 0, 0, 0, 16, 16, 5)
                     if piece.nom == "CAVALIER" :
-                            if not piece.EstBlanc :
-                                pyxel.blt(64 + i*16, 64 + j*16, 0, 16, 16, 16, 16, 5)
-                            else :
-                                pyxel.blt(64 + i*16, 64 + j*16, 0, 16, 0, 16, 16, 5)
+                        if not piece.EstBlanc :
+                            pyxel.blt(64 + i*16, 64 + j*16, 0, 16, 16, 16, 16, 5)
+                        else :
+                            pyxel.blt(64 + i*16, 64 + j*16, 0, 16, 0, 16, 16, 5)
                     if piece.nom == "FOU" :
-                            if not piece.EstBlanc :
-                                pyxel.blt(64 + i*16, 64 + j*16, 0, 32, 16, 16, 16, 5)
-                            else :
-                                pyxel.blt(64 + i*16, 64 + j*16, 0, 32, 0, 16, 16, 5)
+                        if not piece.EstBlanc :
+                            pyxel.blt(64 + i*16, 64 + j*16, 0, 32, 16, 16, 16, 5)
+                        else :
+                            pyxel.blt(64 + i*16, 64 + j*16, 0, 32, 0, 16, 16, 5)
                     if piece.nom == "TOUR" :
-                            if not piece.EstBlanc :
-                                pyxel.blt(64 + i*16, 64 + j*16, 0, 48, 16, 16, 16, 5)
-                            else :
-                                pyxel.blt(64 + i*16, 64 + j*16, 0, 48, 0, 16, 16, 5)
+                        if not piece.EstBlanc :
+                            pyxel.blt(64 + i*16, 64 + j*16, 0, 48, 16, 16, 16, 5)
+                        else :
+                            pyxel.blt(64 + i*16, 64 + j*16, 0, 48, 0, 16, 16, 5)
                     if piece.nom == "DAME" :
-                            if not piece.EstBlanc :
-                                pyxel.blt(64 + i*16, 64 + j*16, 0, 64, 16, 16, 16, 5)
-                            else :
-                                pyxel.blt(64 + i*16, 64 + j*16, 0, 64, 0, 16, 16, 5)
+                        if not piece.EstBlanc :
+                            pyxel.blt(64 + i*16, 64 + j*16, 0, 64, 16, 16, 16, 5)
+                        else :
+                            pyxel.blt(64 + i*16, 64 + j*16, 0, 64, 0, 16, 16, 5)
                     if piece.nom == "ROI" :
-                            if not piece.EstBlanc :
-                                pyxel.blt(64 + i*16, 64 + j*16, 0, 80, 16, 16, 16, 5)
-                            else :
-                                pyxel.blt(64 + i*16, 64 + j*16, 0, 80, 0, 16, 16, 5)
+                        if not piece.EstBlanc :
+                            pyxel.blt(64 + i*16, 64 + j*16, 0, 80, 16, 16, 16, 5)
+                        else :
+                            pyxel.blt(64 + i*16, 64 + j*16, 0, 80, 0, 16, 16, 5)
 
 
 class App:
@@ -265,4 +268,3 @@ class App:
 
 
 App()
-

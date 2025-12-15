@@ -13,6 +13,8 @@ class Piece :
         if coord in self.cases_atteignables:
             self.x, self.y = coord
             self.first_case = False
+            return True
+        return False
 
     def on_board(self, x, y):
         return 0 <= x <= 7 and 0 <= y <= 7
@@ -238,6 +240,7 @@ class App:
         if 64 + j.x * 16 <= pyxel.mouse_x < j.x*16 + 81 and 64 + j.y*16 <= pyxel.mouse_y < 81 + j.y*16 :
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and j.EstBlanc == self.current_player.JoueBlanc:
                 self.piece_selectionnee = j
+                    
 
     def interagir_plateau(self) :
         for i in self.jeu.plateau :
@@ -245,10 +248,22 @@ class App:
                 if j != 0 :
                     if 64 <= pyxel.mouse_x < 193 and 64 <= pyxel.mouse_y < 193 :
                         self.interagir_piece(j)
+                        
+    def deplacement(self):
+        if self.piece_selectionnee != None:
+            for i in range(len(self.jeu.plateau)):
+                for j in range(i):
+                    if 64 + j.x * 16 <= pyxel.mouse_x < j.x*16 + 81 and 64 + j.y*16 <= pyxel.mouse_y < 81 + j.y*16 :
+                        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                            a_joue = self.piece_selectionnee.deplacement((j,i))
+                            if a_joue:
+                                self.current_player = self.Joueur_Noir if self.current_player.JoueBlanc else self.Joueur_Noir
+                            self.piece_selectionne = None
 
     def update(self):
         self.jeu.mettre_pieces(self.Joueur_Noir)
         self.jeu.mettre_pieces(self.Joueur_Blanc)
+        self.deplacement()
         self.interagir_plateau()
 
     def dessiner_piece_selectionnee(self) :

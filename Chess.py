@@ -28,17 +28,19 @@ class Piece :
             ennemi = jeu.Joueur_Blanc
         if self.nom == "PION":
             if self.EstBlanc:
-                delta = [(0,1),(0,2),(1,1),(-1,1)]
-            else:
                 delta = [(0,-1),(0,-2),(-1,-1),(1,-1)]
+            else:
+                delta = [(0,1),(0,2),(1,1),(-1,1)]
             for dx, dy in delta:
                 nx, ny = self.x + dx, self.y + dy
                 if self.on_board(nx, ny):
-                    if dx == 0 and dy == 1 and plateau[ny][nx] == 0:
+                    if self.EstBlanc and dx == 0 and dy == -1 and plateau[ny][nx] == 0:
                         moves.append((nx, ny))
-                    elif self.first_case and dx == 0 and dy == 2 and plateau[ny][nx - 1] == 0 and plateau[ny][nx] == 0:
+                    elif not self.EstBlanc and dx == 0 and dy == 1 and plateau[ny][nx] == 0:
                         moves.append((nx, ny))
-                    elif plateau[ny][nx] != 0 and plateau[ny][nx].EstBlanc != self.EstBlanc:
+                    elif self.first_case and dx == 0 and dy in [2,-2] and plateau[ny - 1][nx] == 0 and plateau[ny][nx] == 0:
+                        moves.append((nx, ny))
+                    elif dx != 0 and plateau[ny][nx] != 0 and plateau[ny][nx].EstBlanc != self.EstBlanc:
                         moves.append((nx, ny))
         if self.nom == "CAVALIER":
             delta = [(2,1),(2,-1),(-2,1),(-2,-1),(1,2),(-1,2),(1,-2),(-1,-2)]
@@ -133,6 +135,7 @@ class Joueur :
 
     def ajouter_score(self, score : int) :
         self.score += score
+        return self.score
 
     def nb_coups(self):
         self.coups += 1
@@ -154,7 +157,7 @@ class Grille :
 
     def mettre_pieces(self, joueur : Joueur) :
         for i in joueur.echiquier :
-            self.plateau[i.x][i.y] = i
+            self.plateau[i.y][i.x] = i
 
     def dessiner_blanc_noir(self, ligne : int) :
         pyxel.rect(64 + 0*self.Taille_Cellule, 64 + ligne*self.Taille_Cellule, self.Taille_Cellule, self.Taille_Cellule, 7)
@@ -191,34 +194,35 @@ class Grille :
                 if type(piece) is not int :
                     if piece.nom == "PION" :
                         if not piece.EstBlanc :
-                            pyxel.blt(64 + i*16, 64 + j*16, 0, 0, 16, 16, 16, 5)
+                            pyxel.blt(64 + j*16, 64 + i*16, 0, 0, 16, 16, 16, 5)
                         else :
-                            pyxel.blt(64 + i*16, 64 + j*16, 0, 0, 0, 16, 16, 5)
+                            pyxel.blt(64 + j*16, 64 + i*16, 0, 0, 0, 16, 16, 5)
                     if piece.nom == "CAVALIER" :
                         if not piece.EstBlanc :
-                            pyxel.blt(64 + i*16, 64 + j*16, 0, 16, 16, 16, 16, 5)
+                            pyxel.blt(64 + j*16, 64 + i*16, 0, 16, 16, 16, 16, 5)
                         else :
-                            pyxel.blt(64 + i*16, 64 + j*16, 0, 16, 0, 16, 16, 5)
+                            pyxel.blt(64 + j*16, 64 + i*16, 0, 16, 0, 16, 16, 5)
                     if piece.nom == "FOU" :
                         if not piece.EstBlanc :
-                            pyxel.blt(64 + i*16, 64 + j*16, 0, 32, 16, 16, 16, 5)
+                            pyxel.blt(64 + j*16, 64 + i*16, 0, 32, 16, 16, 16, 5)
                         else :
-                            pyxel.blt(64 + i*16, 64 + j*16, 0, 32, 0, 16, 16, 5)
+                            pyxel.blt(64 + j*16, 64 + i*16, 0, 32, 0, 16, 16, 5)
                     if piece.nom == "TOUR" :
                         if not piece.EstBlanc :
-                            pyxel.blt(64 + i*16, 64 + j*16, 0, 48, 16, 16, 16, 5)
+                            pyxel.blt(64 + j*16, 64 + i*16, 0, 48, 16, 16, 16, 5)
                         else :
-                            pyxel.blt(64 + i*16, 64 + j*16, 0, 48, 0, 16, 16, 5)
+                            pyxel.blt(64 + j*16, 64 + i*16, 0, 48, 0, 16, 16, 5)
                     if piece.nom == "DAME" :
                         if not piece.EstBlanc :
-                            pyxel.blt(64 + i*16, 64 + j*16, 0, 64, 16, 16, 16, 5)
+                            pyxel.blt(64 + j*16, 64 + i*16, 0, 64, 16, 16, 16, 5)
                         else :
-                            pyxel.blt(64 + i*16, 64 + j*16, 0, 64, 0, 16, 16, 5)
+                            pyxel.blt(64 + j*16, 64 + i*16, 0, 64, 0, 16, 16, 5)
                     if piece.nom == "ROI" :
                         if not piece.EstBlanc :
-                            pyxel.blt(64 + i*16, 64 + j*16, 0, 80, 16, 16, 16, 5)
+                            pyxel.blt(64 + j*16, 64 + i*16, 0, 80, 16, 16, 16, 5)
                         else :
-                            pyxel.blt(64 + i*16, 64 + j*16, 0, 80, 0, 16, 16, 5)
+                            pyxel.blt(64 + j*16, 64 + i*16, 0, 80, 0, 16, 16, 5)
+                            
 
 
 class App:
@@ -250,25 +254,42 @@ class App:
                         self.interagir_piece(j)
                         
     def deplacement(self):
-        if self.piece_selectionnee != None:
-            for i in range(len(self.jeu.plateau)):
-                for j in range(i):
-                    if 64 + j.x * 16 <= pyxel.mouse_x < j.x*16 + 81 and 64 + j.y*16 <= pyxel.mouse_y < 81 + j.y*16 :
-                        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                            a_joue = self.piece_selectionnee.deplacement((j,i))
+        a_joue = False
+        for y in range(8):
+            for x in range(8):
+                if 64 + x * 16 <= pyxel.mouse_x < x*16 + 81 and 64 + y*16 <= pyxel.mouse_y < 81 + y*16 :
+                    if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                        if self.piece_selectionnee != None:
+                            a_joue = self.piece_selectionnee.deplacement((x,y))
                             if a_joue:
-                                self.current_player = self.Joueur_Noir if self.current_player.JoueBlanc else self.Joueur_Noir
-                            self.piece_selectionne = None
+                                if self.current_player.JoueBlanc:
+                                    self.current_player = self.Joueur_Noir
+                                else:
+                                    self.current_player = self.Joueur_Blanc
+                                piece_cible = self.jeu.plateau[y][x]
+                                if piece_cible != 0:
+                                    if piece_cible.EstBlanc:
+                                        self.Joueur_Blanc.echiquier.remove(piece_cible)
+                                    else:
+                                        self.Joueur_Noir.echiquier.remove(piece_cible)
+                        self.piece_selectionnee = None
+        return a_joue
 
     def update(self):
+        self.jeu.plateau = self.jeu.creer_plateau()
         self.jeu.mettre_pieces(self.Joueur_Noir)
         self.jeu.mettre_pieces(self.Joueur_Blanc)
-        self.deplacement()
-        self.interagir_plateau()
+        if not self.deplacement():
+            self.interagir_plateau()
+        self.Joueur_Noir.update_cases_controlees(self)
+        self.Joueur_Blanc.update_cases_controlees(self)
 
     def dessiner_piece_selectionnee(self) :
         if self.piece_selectionnee is not None:
             pyxel.rect(64 + self.piece_selectionnee.x*16, 64 + self.piece_selectionnee.y*16, 16, 16, 11)
+            for x, y in self.piece_selectionnee.cases_atteignables:
+                pyxel.circ(72 + x * 16, 72 + y * 16, 5, 13)
+            
 
     def dessiner_arriere_plan(self) :
         pyxel.rect(0, 0, 256, 256, 7)

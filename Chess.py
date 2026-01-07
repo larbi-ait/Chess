@@ -295,12 +295,20 @@ class App:
         pyxel.rect(0, 0, 256, 256, 7)
         pyxel.rect(48, 48, 160, 160, 13)
 
+    def trait(self):
+        if self.current_player.JoueBlanc:
+            pyxel.text(100,20,"TRAIT AUX BLANCS", 0)
+        else:
+            pyxel.text(100,20,"TRAIT AUX NOIRS", 0)
+    
     def draw(self):
         pyxel.cls(0)
         self.dessiner_arriere_plan()
         self.jeu.dessiner_grille()
         self.dessiner_piece_selectionnee()
         self.jeu.dessiner_pieces()
+        self.trait()
 
 
 App()
+

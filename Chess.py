@@ -247,7 +247,7 @@ class App:
         pyxel.load("gok.pyxres")
         pyxel.mouse(True)
         self.last_time = pyxel.frame_count
-        self.en_pause = False
+        self.en_pause = True
         pyxel.run(self.update, self.draw)
 
     def dessiner_pause(self):
@@ -378,6 +378,7 @@ class App:
 
 
 App()
+
 
 
 

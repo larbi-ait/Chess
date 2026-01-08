@@ -296,6 +296,11 @@ class App:
                                         self.Joueur_Blanc.echiquier.remove(piece_cible)
                                     else:
                                         self.Joueur_Noir.echiquier.remove(piece_cible)
+
+                                if self.current_player.JoueBlanc:
+                                    self.Joueur_Blanc.nb_coups()
+                                else:
+                                    self.Joueur_Noir.nb_coups()
                         self.piece_selectionnee = None
         return a_joue
 
@@ -335,6 +340,10 @@ class App:
 
         pyxel.text(30, 20, f"BLANC : {format_time(self.temps_blanc)}", 0)
         pyxel.text(30, 40, f"NOIR  : {format_time(self.temps_noir)}", 0)
+        
+    def afficher_coups(self):
+        pyxel.text(150, 20, f"Coups BLANC : {self.Joueur_Blanc.coups}", 0)
+        pyxel.text(150, 40, f"Coups NOIR  : {self.Joueur_Noir.coups}", 0)
     
     def draw(self):
         pyxel.cls(0)
@@ -344,9 +353,11 @@ class App:
         self.jeu.dessiner_pieces()
         self.trait()
         self.afficher_temps()
+        self.afficher_coups()
 
 
 App()
+
 
 
 

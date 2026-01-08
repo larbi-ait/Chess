@@ -233,12 +233,30 @@ class App:
         self.Joueur_Noir.update_cases_controlees(self)
         self.Joueur_Blanc.update_cases_controlees(self)
         self.current_player = self.Joueur_Blanc
+        self.temps_blanc = 10 * 60  # 10 minutes
+        self.temps_noir = 10 * 60
         self.piece_selectionnee = None
 
         pyxel.init(256, 256, title="Grid Of Kings")
         pyxel.load("gok.pyxres")
         pyxel.mouse(True)
+        self.last_time = pyxel.frame_count
         pyxel.run(self.update, self.draw)
+
+    def update_temps(self):
+        now = pyxel.frame_count
+        delta_frames = now - self.last_time
+        delta_seconds = delta_frames / 30
+        if self.current_player.JoueBlanc:
+            self.temps_blanc -= delta_seconds
+            if self.temps_blanc < 0:
+                self.temps_blanc = 0
+        else:
+            self.temps_noir -= delta_seconds
+            if self.temps_noir < 0:
+                self.temps_noir = 0
+
+        self.last_time = now
 
     def interagir_piece(self, j : Piece) :
         if 64 + j.x * 16 <= pyxel.mouse_x < j.x*16 + 81 and 64 + j.y*16 <= pyxel.mouse_y < 81 + j.y*16 :
@@ -276,6 +294,7 @@ class App:
         return a_joue
 
     def update(self):
+        self.update_temps()
         self.jeu.plateau = self.jeu.creer_plateau()
         self.jeu.mettre_pieces(self.Joueur_Noir)
         self.jeu.mettre_pieces(self.Joueur_Blanc)
@@ -294,12 +313,22 @@ class App:
     def dessiner_arriere_plan(self) :
         pyxel.rect(0, 0, 256, 256, 7)
         pyxel.rect(48, 48, 160, 160, 13)
+        pyxel.blt(5,25,0,0,32,16,16,5)
 
     def trait(self):
         if self.current_player.JoueBlanc:
             pyxel.text(100,20,"TRAIT AUX BLANCS", 0)
         else:
             pyxel.text(100,20,"TRAIT AUX NOIRS", 0)
+
+        
+    def afficher_temps(self):
+        def format_time(t):
+            t = int(t)
+            return f"{t//60:02d}:{t%60:02d}"
+
+        pyxel.text(30, 20, f"BLANC : {format_time(self.temps_blanc)}", 0)
+        pyxel.text(30, 40, f"NOIR  : {format_time(self.temps_noir)}", 0)
     
     def draw(self):
         pyxel.cls(0)
@@ -308,7 +337,9 @@ class App:
         self.dessiner_piece_selectionnee()
         self.jeu.dessiner_pieces()
         self.trait()
+        self.afficher_temps()
 
 
 App()
+
 

@@ -13,9 +13,15 @@ class Piece :
         if coord in self.cases_atteignables:
             self.x, self.y = coord
             self.first_case = False
+            if self.nom == "PION":
+                if (self.EstBlanc and self.y == 0) or (not self.EstBlanc and self.y == 7):
+                    self.promouvoir()
             return True
         return False
 
+    def promouvoir(self):
+        self.nom = "DAME"
+        
     def on_board(self, x, y):
         return 0 <= x <= 7 and 0 <= y <= 7
             
@@ -341,5 +347,6 @@ class App:
 
 
 App()
+
 
 

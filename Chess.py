@@ -247,7 +247,24 @@ class App:
         pyxel.load("gok.pyxres")
         pyxel.mouse(True)
         self.last_time = pyxel.frame_count
+        self.en_pause = False
         pyxel.run(self.update, self.draw)
+
+    def dessiner_pause(self):
+        x, y = 120, 220
+
+        if self.en_pause:
+            
+            pyxel.blt(x, y, 0, 16, 32, 16, 16, 5)
+        else:
+           
+            pyxel.blt(x, y, 0, 32, 32, 16, 16, 5)
+    
+    def gerer_pause(self):
+        x, y = 120, 220
+        if x <= pyxel.mouse_x <= x + 16 and y <= pyxel.mouse_y <= y + 16:
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                self.en_pause = not self.en_pause
 
     def update_temps(self):
         now = pyxel.frame_count
@@ -305,6 +322,9 @@ class App:
         return a_joue
 
     def update(self):
+        self.gerer_pause()
+        if self.en_pause:
+            return
         self.update_temps()
         self.jeu.plateau = self.jeu.creer_plateau()
         self.jeu.mettre_pieces(self.Joueur_Noir)
@@ -354,9 +374,11 @@ class App:
         self.trait()
         self.afficher_temps()
         self.afficher_coups()
+        self.dessiner_pause()
 
 
 App()
+
 
 
 

@@ -348,9 +348,9 @@ class App:
 
     def trait(self):
         if self.current_player.JoueBlanc:
-            pyxel.text(100,20,"TRAIT AUX BLANCS", 0)
+            pyxel.text(95,5,"TRAIT AUX BLANCS", 8)
         else:
-            pyxel.text(100,20,"TRAIT AUX NOIRS", 0)
+            pyxel.text(95,5,"TRAIT AUX NOIRS", 8)
 
         
     def afficher_temps(self):
@@ -378,6 +378,7 @@ class App:
 
 
 App()
+
 
 
 

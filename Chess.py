@@ -362,8 +362,8 @@ class App:
         pyxel.text(30, 40, f"NOIR  : {format_time(self.temps_noir)}", 0)
         
     def afficher_coups(self):
-        pyxel.text(150, 20, f"Coups BLANC : {self.Joueur_Blanc.coups}", 0)
-        pyxel.text(150, 40, f"Coups NOIR  : {self.Joueur_Noir.coups}", 0)
+        pyxel.text(150, 20, f"Coups BLANC : {self.Joueur_Noir.coups}", 0)
+        pyxel.text(150, 40, f"Coups NOIR  : {self.Joueur_Blanc.coups}", 0)
     
     def draw(self):
         pyxel.cls(0)
@@ -378,6 +378,7 @@ class App:
 
 
 App()
+
 
 
 

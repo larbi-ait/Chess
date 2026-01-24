@@ -239,8 +239,8 @@ class App:
         self.Joueur_Noir.update_cases_controlees(self)
         self.Joueur_Blanc.update_cases_controlees(self)
         self.current_player = self.Joueur_Blanc
-        self.temps_blanc = 10 * 60  # 10 minutes
-        self.temps_noir = 10 * 60
+        self.temps_blanc = 10.01 * 60  # 10 minutes
+        self.temps_noir = 10.01 * 60
         self.piece_selectionnee = None
 
         pyxel.init(256, 256, title="Grid Of Kings")
@@ -264,9 +264,13 @@ class App:
         x, y = 120, 220
         if x <= pyxel.mouse_x <= x + 16 and y <= pyxel.mouse_y <= y + 16:
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                if self.en_pause:
+                    self.last_time = pyxel.frame_count
                 self.en_pause = not self.en_pause
 
     def update_temps(self):
+        if self.en_pause:
+            return
         now = pyxel.frame_count
         delta_frames = now - self.last_time
         delta_seconds = delta_frames / 30
@@ -378,6 +382,7 @@ class App:
 
 
 App()
+
 
 
 
